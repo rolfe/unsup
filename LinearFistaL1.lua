@@ -86,10 +86,12 @@ function LinearFistaL1:parameters()
 end
 
 -- we do inference in forward
-function LinearFistaL1:updateOutput(input)
+function LinearFistaL1:updateOutput(input, prediction)
    self.input = input
    -- init code to all zeros
-   self.code:fill(0)
+   --self.code:fill(0)
+   -- init code to the prediction
+   self.code:copy(prediction)
    -- do fista solution
    local oldL = self.params.L
    local code, h = optim.FistaLS(self.f, self.g, self.pl, self.code, self.params)
@@ -127,13 +129,10 @@ function LinearFistaL1:accGradParameters(input)
    self.D.gradBias:fill(0)
 end
 
-function LinearFistaL1:normalize()
-   -- normalize the dictionary
-end
-
 function LinearFistaL1:updateParameters(learningRate)
    self.D:updateParameters(learningRate)
    self.D.bias:fill(0)
+   self:normalize()
 end
 
 function LinearFistaL1:normalize()
